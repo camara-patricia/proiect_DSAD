@@ -1,0 +1,23 @@
+-> aplicarea metodelor statistice și computaționale pentru a extrage informații semnificative din seturile de date.
+-> utilizarea a două dintre tehnicile de analiză a datelor specificate, selectate în funcție de natura datelor 
+
+Aceste metode includ:
+1. Analiza Componentelor Principale (PCA): O tehnică utilizată pentru a reduce dimensionalitatea seturilor mari de date, păstrând în același timp cât mai multă varianță posibil. PCA transformă variabilele originale într-un nou set de variabile necorelate numite componente principale, care sunt ordonate în funcție de cantitatea de varianță pe care o explică.
+2. Analiza Factorială (Exploratorie): O metodă care vizează identificarea variabilelor latente subiacente sau a factorilor care explică corelațiile observate între variabile. Este deosebit de utilă în înțelegerea structurii datelor complexe și reducerea numărului de variabile pentru analize ulterioare.
+3. Analiza Canonică a Corelațiilor: O metodă statistică multivariată care examinează relațiile dintre două seturi de variabile, identificând perechi de variabile canonice care sunt corelate la maximum.
+4. Analiza Discriminanta (Analiza Discriminanta Liniară): O tehnică de clasificare utilizată pentru a distinge între grupuri predefinite pe baza variabilelor predictoare, adesea utilizată în recunoașterea tiparelor și modelarea predictivă.
+5. Analiza Clusterelor Ierarhice: O metodă de învățare nesupervizată care grupează punctele de date în clustere pe baza similarității lor, utilă pentru identificarea grupărilor naturale din cadrul datelor.
+6. Analiza Corespondențelor Multiple: O extensie a analizei corespondențelor pentru date categorice, permițând explorarea relațiilor dintre mai multe variabile categorice.
+
+-> Python -> PyCharm. 
+Rezultatele includ un set structurat de componente:
+* Un document MS Word detaliat care descrie proiectul, inclusiv sursele de date (cu link-uri, dacă este cazul), referințe temporale, descrieri ale variabilelor (care explică de ce sunt alese variabilele), observații (ce reprezintă datele), abordarea aleasă pentru analiza datelor, justificarea selectării metodelor specifice, prezentarea rezultatelor (excluzând graficele generate de cod, care pot fi produse în timpul rulării), interpretarea rezultatelor și discuții și concluzii.
+* Fișiere de date de intrare necesare pentru analiză.
+* Fișiere cu cod sursă Python care implementează analiza.
+* Fișiere de date de ieșire care conțin rezultatele și constatările procesate.
+
+Calitatea și relevanța datelor sunt factori critici care sporesc credibilitatea analizei. Accentul trebuie pus pe înțelegerea aprofundată a datelor, selectarea metodelor de analiză adecvate și furnizarea de interpretări clare și perspicace ale rezultatelor. 
+-> un singur fișier de arhivă -> (nume_echipă_grup.zip)
+-> maximă de 5 MB
+-> încărcat pe online.ase.ro
+
