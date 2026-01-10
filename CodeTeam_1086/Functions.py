@@ -5,43 +5,44 @@ import pandas.api.types as pdt
 
 
 def standardizare(X):
-    # asumam ca primim ca paramentru
-    # un numpy.ndarray
+    """
+        Standardizează matricea X (z-score).
+        Formula: z = (x - medie) / abatere_standard
+        Rezultat: fiecare coloană are media=0 și std=1
+    """
     medii = np.mean(a=X, axis=0) # medii pe coloane
-    # axele se numeroteaza de la dreapta la stanga
-    # print(medii.shape)
-    abateri_std = np.std(a=X, axis=0) # avem variabilele pe coloane
+    # Axele se numerotează de la dreapta la stânga
+    abateri_std = np.std(a=X, axis=0) # Avem variabilele pe coloane
     return (X - medii) / abateri_std
-
-# obligatoriu in acp
 
 
 def replace_na(X):
-    '''
-     replace missing values by mean
-     t - numpy.ndarray
-     '''
+    """
+    Înlocuiește valorile lipsă (NaN) cu media coloanei.
+    Necesar înainte de ACP deoarece algoritmul nu acceptă NaN.
+    """
     means = np.nanmean(X, axis=0)
     k_nan = np.where(np.isnan(X))
     X[k_nan] = means[k_nan[1]]
     return X
 
 def center(x):
-    '''
-     x - data table, expect numpy.ndarray
-     '''
+    """
+    Centrează datele (scade media).
+    Rezultat: media fiecărei coloane devine 0.
+    Diferență față de standardizare: NU împarte la std.
+    """
     means = np.mean(x, axis=0)
     return (x - means)
 
 
 def regularise(t, y=None):
-    '''
-    Eigenvector regularisation
-    t - table of eigenvectors,
-    expect either numpy.ndarray or pandas.DataFrame
-    '''
+    """
+    Regularizează/normalizează datele într-un interval.
+    t: tabelul de date
+    y: valorile țintă (opțional)
+    """
 
-    # if type(t) is pd.DataFrame:
     if isinstance(t, pd.DataFrame):
         for c in t.columns:
             minim = t[c].min()
@@ -49,7 +50,6 @@ def regularise(t, y=None):
             if abs(minim) > abs(maxim):
                 t[c] = -t[c]
                 if y is not None:
-                    # determine column index
                     k = t.columns.get_loc(c)
                     y[:, k] = -y[:, k]
     if isinstance(t, np.ndarray):
@@ -63,11 +63,11 @@ def regularise(t, y=None):
 
 
 def replace_na_df(t):
-    '''
-    replace missing values by
-    mean/mode
-    t - pandas.DataFrame
-    '''
+    """
+    Înlocuiește NaN în DataFrame pandas.
+    Pentru coloane numerice: înlocuiește cu media.
+    Pentru coloane categoriale: înlocuiește cu moda (cea mai frecventă valoare).
+    """
 
     for c in t.columns:
         if pdt.is_numeric_dtype(t[c]):
@@ -82,10 +82,7 @@ def replace_na_df(t):
 
 
 def replace_na(X):
-    '''
-     replace missing values by mean
-     t - numpy.ndarray
-     '''
+    # înlocuiește valorile lipsă (NaN) cu media coloanei
     means = np.nanmean(X, axis=0)
     k_nan = np.where(np.isnan(X))
     X[k_nan] = means[k_nan[1]]
@@ -93,12 +90,13 @@ def replace_na(X):
 
 
 def cluster_distribution(h, k):
+    # Calculează distribuția observațiilor în k clustere.
     # h - este ierarhia de clustere numpy.ndarray
-    # k - numar clustere din partitia de maxima stabilitate
-    n = np.shape(h)[0] + 1  # numarul de clustere de pe primul nivel al ierarhiei
+    # k - numar clustere din partiția de maximă stabilitate
+    n = np.shape(h)[0] + 1  # Numărul de clustere de pe primul nivel al ierarhiei
     g = np.arange(0, n)
     print(g)
-    for i in range(n-k):  # iteram pana la jonctiune ce da partitia de maxima stabilitate
+    for i in range(n-k):  # Iteram până la joncțiune ce dă partiția de maximă stabilitate
         k1 = h[i, 0]
         k2 = h[i, 1]
         g[g==k1] = n + i
@@ -110,17 +108,14 @@ def cluster_distribution(h, k):
 
 
 def threshold(h):
-    '''
-    Threshold value calculation for determining
-    the maximum stability partition
-    m - the maximum no. of  junctions
-    '''
-    m = np.shape(h)[0]  # numarul maxim de jonctiuni
+    # Găsește pragul optim = saltul maxim în distanțele de agregare
+
+    m = np.shape(h)[0]  # Numărul maxim de joncțiuni
     dist_1 = h[1:, 2]
     dist_2 = h[:m-1, 2]
     dif = dist_1 - dist_2
     print(dif)
-    j = np.argmax(dif)  # joctiunea unde avem partitia de maxima stabilitate
+    j = np.argmax(dif)  # joncțiunea unde avem partiția de maximă stabilitate
     print(j)
     threshold = (h[j, 2] + h[j+1, 2]) / 2
     return threshold, j, m
@@ -141,11 +136,7 @@ def cluster_display(g, row_labels, col_label, file_name):
 
 
 def color_clusters(h, k, codes):
-    '''
-    h - hierarchy, numpy.ndarray
-    k - no. of colors
-    codes - cluster codes
-    '''
+    # atribuie culori clusterelor și joncțiunilor
 
     colors = np.array(graphics._COLORS)
     nr_colors = len(colors)
@@ -153,10 +144,8 @@ def color_clusters(h, k, codes):
     n = m + 1
     cluster_colors = np.full(shape=(2 * n * 1,),
                              fill_value="", dtype=np.chararray)
-    # clusters color setting singleton
     for i in range(n):
         cluster_colors[i] = colors[codes[i] % nr_colors]
-    # setting color junctions
     for i in range(m):
         k1 = int(h[i, 0])
         k2 = int(h[i, 1])
