@@ -43,6 +43,42 @@ comp_df.to_csv('./dataOUT/ComponentePrincipale.csv')
 # grafic componente principale
 g.intesitate_legaturi(R2=comp_df, titlu='Conponente principale')
 
+Rxc = modelACP.getFactorLoadings()
+# salvare factor loadings in fisier CSV
+# TODO
+Rxc_df = pd.DataFrame(data=Rxc,
+        index=(v for v in vars),
+        columns=('C'+str(j+1) for j in range(comp.shape[1])))
+# creare grafic corelograma factorilor de corelatie
+g.corelograma(R2=Rxc_df)
+# g.afisare()
+
+# extragere scoruri (componente principale standardizate)
+scoruri = modelACP.getScoruri()
+# salvati scorurile in fisier CSV
+# TODO
+scoruri_df = pd.DataFrame(data=scoruri,
+            index=(o for o in obs),
+            columns=('C'+str(j+1) for j in range(comp.shape[1])))
+# creare grafic scoruri
+g.intesitate_legaturi(R2=scoruri_df,
+        titlu='Scoruri - conponente principale standardizate',
+        color='Blues')
+# g.afisare()
+
+# extragere comunalitati
+comun = modelACP.getComunalitati()
+# salvati comunalitatile in fisier CSV
+# TODO
+comun_df = pd.DataFrame(data=comun,
+        index=(v for v in vars),
+        columns=('C'+str(j+1) for j in range(comp.shape[1])))
+# grafic al comunalitatilor
+g.corelograma(R2=comun_df, titlu='Graficul comunalitatilor)')
+# g.afisare()
+
+# creati cercul corelatiior pentru primele 2 compinenete principale
+g.cercul_corelatiilor(R2=Rxc_df)
 g.afisare()
 
 
