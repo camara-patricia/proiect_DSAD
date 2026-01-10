@@ -9,6 +9,7 @@ import pandas as pd
 
 def corelograma(R2=None, dec=2, titlu='Corelograma',
                 valMin=-1, valMax=1):
+    # Heatmap pentru corelații/loadings cu valori [-1, 1]
     plt.figure(num=titlu, figsize=(18 * 2, 8))
     plt.title(label=titlu, fontsize=12,
               verticalalignment='bottom', color='Blue')
@@ -20,6 +21,7 @@ def corelograma(R2=None, dec=2, titlu='Corelograma',
 
 def intesitate_legaturi(R2=None, dec=2, titlu='Intensitate legaturi',
                         color='Oranges'):
+    # Heatmap transpus pentru vizualizarea intensității legăturilor
     R2 = R2.T
     plt.figure(num=titlu, figsize=(20, 10))
     plt.title(label=titlu, fontsize=12,
@@ -32,6 +34,8 @@ def intesitate_legaturi(R2=None, dec=2, titlu='Intensitate legaturi',
 
 def cercul_corelatiilor(R2=None, V1=0, V2=1, dec=2,
                         titlu='Cercul corelatiilor'):
+    # Cercul corelațiilor pentru 2 componente principale.
+    # Variabile apropiate = corelate pozitiv, opuse = corelate negativ.
     plt.figure(num=titlu, figsize=(8, 7))
     plt.title(label=titlu +' intre ' + 'Componenta ' + str(V1+1) + ' si ' +
               'Componenta ' + str(V2+1), fontsize=12,
@@ -80,13 +84,14 @@ def valori_proprii(valori,
     plt.plot(componente, valori, 'bo-')
     plt.axhline(y=1, color='Red')
 
-
+# Paleta de culori pentru clustere
 _COLORS = ['y', 'r', 'b', 'g', 'c', 'm', 'sienna', 'coral',
            'darkblue', 'lime', 'grey',
            'tomato', 'indigo', 'teal', 'orange', 'darkgreen']
 
 
 def plot_clusters(x, y, g, groups, labels=None, title="Plot clusters"):
+    # Scatter plot cu observații colorate pe clustere
     g_ = np.array(g)
     f = plt.figure(figsize=(12, 7))
     ax = f.add_subplot(1, 1, 1)
@@ -107,6 +112,7 @@ def plot_clusters(x, y, g, groups, labels=None, title="Plot clusters"):
 
 
 def histograms(x, g, var):
+    # Histograme separate pe clustere pentru o variabilă
     groups = set(g)
     g_ = np.array(g)
     m = len(groups)
@@ -131,6 +137,8 @@ def histograms(x, g, var):
 
 def dendrogram(h, labels=None, title='Hierarchical classification',
                threshold=None, colors=None):
+    # Dendrogramă pentru clusterizare ierarhică.
+    # threshold = linia de tăiere pentru partiția optimă.
     f = plt.figure(figsize=(12, 7))
     ax = f.add_subplot(1, 1, 1)
     ax.set_title(title, fontsize=14, color='k')
@@ -166,14 +174,14 @@ def silhouette_plot(X, labels, title="Silhouette plot", save_path=None):
     from sklearn.metrics import silhouette_samples, silhouette_score
 
     labels = np.array(labels)
-    # dacă ai etichete începând de la 1, e ok
+    # Dacă ai etichete începând de la 1, e ok
     n_clusters = len(np.unique(labels))
 
     if n_clusters < 2:
         raise ValueError("Silhouette are sens doar pentru cel puțin 2 clustere.")
 
-    s_avg = silhouette_score(X, labels)
-    s_vals = silhouette_samples(X, labels)
+    s_avg = silhouette_score(X, labels) # scor mediu global
+    s_vals = silhouette_samples(X, labels) # scoruri individuale
 
     plt.figure(figsize=(10, 6))
     plt.title(f"{title} | silhouette score = {s_avg:.3f}")
@@ -191,7 +199,7 @@ def silhouette_plot(X, labels, title="Silhouette plot", save_path=None):
         plt.text(-0.05, y_lower + 0.5 * size_c, str(c))
         y_lower = y_upper + 10
 
-    plt.axvline(x=s_avg, linestyle="--")
+    plt.axvline(x=s_avg, linestyle="--") # linie pentru scorul mediu
     plt.yticks([])
     plt.xlim([-0.2, 1.0])
 
@@ -203,9 +211,8 @@ def silhouette_plot(X, labels, title="Silhouette plot", save_path=None):
 def plot_observatii_plan(scores_df, c1='C1', c2='C2',
                          title='Observații în planul componentelor',
                          save_path=None):
-    """
-    scores_df: pandas.DataFrame cu scoruri (rânduri=observații, coloane=C1,C2,...)
-    """
+
+    # scores_df: pandas.DataFrame cu scoruri (rânduri=observații, coloane=C1,C2,...)
     import matplotlib.pyplot as plt
 
     plt.figure(figsize=(10, 7))
@@ -225,4 +232,5 @@ def plot_observatii_plan(scores_df, c1='C1', c2='C2',
 
     if save_path:
         plt.savefig(save_path, format='svg', bbox_inches='tight')
+
 
