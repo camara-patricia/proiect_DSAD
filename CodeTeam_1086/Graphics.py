@@ -1,11 +1,10 @@
-import numpy as np
 import seaborn as sb
 import matplotlib.pyplot as plt
+import matplotlib.colors as color
+import numpy as np
+import scipy.cluster.hierarchy as hclust
+import statsmodels.graphics.mosaicplot as smosaic
 import pandas as pd
-
-
-# portal pentru grafice in Python
-# https://python-graph-gallery.com/
 
 
 def corelograma(R2=None, dec=2, titlu='Corelograma',
@@ -13,8 +12,6 @@ def corelograma(R2=None, dec=2, titlu='Corelograma',
     plt.figure(num=titlu, figsize=(18 * 2, 8))
     plt.title(label=titlu, fontsize=12,
               verticalalignment='bottom', color='Blue')
-    # asumam ca primit ca parametru
-    # un numpy.ndarray sau pandas.DataFrame
     sb.heatmap(data=np.round(a=R2, decimals=dec),
                vmin=valMin, vmax=valMax,
                cmap='bwr', annot=True)
@@ -27,8 +24,6 @@ def intesitate_legaturi(R2=None, dec=2, titlu='Intensitate legaturi',
     plt.figure(num=titlu, figsize=(20, 10))
     plt.title(label=titlu, fontsize=12,
               verticalalignment='bottom', color='Blue')
-    # asumam ca primit ca parametru
-    # un numpy.ndarray sau pandas.DataFrame
     sb.heatmap(data=np.round(a=R2, decimals=dec),
                cmap=color, annot=True, annot_kws={'size': 4, "rotation": 90})
     plt.xticks(fontsize=6)
@@ -37,13 +32,10 @@ def intesitate_legaturi(R2=None, dec=2, titlu='Intensitate legaturi',
 
 def cercul_corelatiilor(R2=None, V1=0, V2=1, dec=2,
                         titlu='Cercul corelatiilor'):
-    # putem primi ca tip d eparametru in R2 fie un numpy.ndarray,
-    # fie un pandas.DataFrame
     plt.figure(num=titlu, figsize=(8, 7))
     plt.title(label=titlu +' intre ' + 'Componenta ' + str(V1+1) + ' si ' +
               'Componenta ' + str(V2+1), fontsize=12,
               verticalalignment='bottom', color='Green')
-    # generez puncte pe un cerc
     theta = [t for t in np.arange(start=0, stop=2*np.pi, step=0.01)]
     x = [np.cos(t) for t in theta]
     y = [np.sin(t) for t in theta]
@@ -58,7 +50,6 @@ def cercul_corelatiilor(R2=None, V1=0, V2=1, dec=2,
                    verticalalignment='top', color='Blue')
         plt.scatter(x=R2[:, V1], y=R2[:, V2], color='Red')
         for i in range(R2.shape[0]):
-            # plt.text(x=R2[i, V1], y=R2[i, V2], s='text')
             plt.text(x=R2[i, V1], y=R2[i, V2], color='Black',
                 s='(' + str(np.round(R2[i, V1], decimals=dec)) + ', ' +
                   str(np.round(R2[i, V2], decimals=dec)) + ')')
@@ -67,8 +58,6 @@ def cercul_corelatiilor(R2=None, V1=0, V2=1, dec=2,
                   verticalalignment='top', color='Blue')
         plt.ylabel(ylabel=R2.columns[V2], fontsize=10,
                    verticalalignment='top', color='Blue')
-        # plt.scatter(x=R2.values[:, V1], y=R2.values[:, V2], color='Blue')
-        # plt.scatter(x=R2.iloc[:].iloc[V1], y=R2.iloc[:].iloc[V2], color='Blue') # nu fuctioneaza cu slicing pe liste !!!
         plt.scatter(x=R2.iloc[:, V1], y=R2.iloc[:, V2], color='Blue')
         for i in range(R2.index.size):
             plt.text(x=R2.iloc[i].iloc[V1], y=R2.iloc[i].iloc[V2], color='Black',
@@ -89,16 +78,7 @@ def valori_proprii(valori,
                verticalalignment='bottom', color='Blue')
     componente = ['C'+str(i+1) for i in range(valori.shape[0])]
     plt.plot(componente, valori, 'bo-')
-    # plt.plot(componente, valori, 'b^-')
     plt.axhline(y=1, color='Red')
-
-import seaborn as sb
-import matplotlib.pyplot as plt
-import matplotlib.colors as color
-import numpy as np
-import scipy.cluster.hierarchy as hclust
-import statsmodels.graphics.mosaicplot as smosaic
-import pandas as pd
 
 
 _COLORS = ['y', 'r', 'b', 'g', 'c', 'm', 'sienna', 'coral',
@@ -107,10 +87,6 @@ _COLORS = ['y', 'r', 'b', 'g', 'c', 'm', 'sienna', 'coral',
 
 
 def plot_clusters(x, y, g, groups, labels=None, title="Plot clusters"):
-    '''
-    x, y - expect numpy.ndarray
-    g - number of groups
-    '''
     g_ = np.array(g)
     f = plt.figure(figsize=(12, 7))
     ax = f.add_subplot(1, 1, 1)
@@ -155,10 +131,6 @@ def histograms(x, g, var):
 
 def dendrogram(h, labels=None, title='Hierarchical classification',
                threshold=None, colors=None):
-    '''
-    h - expect a numpy.ndarray hierarchy
-    '''
-
     f = plt.figure(figsize=(12, 7))
     ax = f.add_subplot(1, 1, 1)
     ax.set_title(title, fontsize=14, color='k')
@@ -174,3 +146,83 @@ def dendrogram(h, labels=None, title='Hierarchical classification',
 
 def afisare():
     plt.show()
+
+def elbow_from_linkage(h, title="Elbow (distanțe de agregare)", save_path=None):
+    d = h[:, 2]
+    x = np.arange(1, len(d) + 1)
+
+    plt.figure(figsize=(10, 6))
+    plt.title(title)
+    plt.xlabel("Joncțiune (pas de agregare)")
+    plt.ylabel("Distanța de agregare")
+    plt.plot(x, d, marker='o')
+
+    if save_path:
+        plt.savefig(save_path, format='svg', bbox_inches='tight')
+
+
+def silhouette_plot(X, labels, title="Silhouette plot", save_path=None):
+
+    from sklearn.metrics import silhouette_samples, silhouette_score
+
+    labels = np.array(labels)
+    # dacă ai etichete începând de la 1, e ok
+    n_clusters = len(np.unique(labels))
+
+    if n_clusters < 2:
+        raise ValueError("Silhouette are sens doar pentru cel puțin 2 clustere.")
+
+    s_avg = silhouette_score(X, labels)
+    s_vals = silhouette_samples(X, labels)
+
+    plt.figure(figsize=(10, 6))
+    plt.title(f"{title} | silhouette score = {s_avg:.3f}")
+    plt.xlabel("Coeficient Silhouette")
+    plt.ylabel("Cluster")
+
+    y_lower = 10
+    for c in np.unique(labels):
+        s_c = s_vals[labels == c]
+        s_c.sort()
+        size_c = s_c.shape[0]
+        y_upper = y_lower + size_c
+
+        plt.fill_betweenx(np.arange(y_lower, y_upper), 0, s_c, alpha=0.7)
+        plt.text(-0.05, y_lower + 0.5 * size_c, str(c))
+        y_lower = y_upper + 10
+
+    plt.axvline(x=s_avg, linestyle="--")
+    plt.yticks([])
+    plt.xlim([-0.2, 1.0])
+
+    if save_path:
+        plt.savefig(save_path, format='svg', bbox_inches='tight')
+
+    return s_avg
+
+def plot_observatii_plan(scores_df, c1='C1', c2='C2',
+                         title='Observații în planul componentelor',
+                         save_path=None):
+    """
+    scores_df: pandas.DataFrame cu scoruri (rânduri=observații, coloane=C1,C2,...)
+    """
+    import matplotlib.pyplot as plt
+
+    plt.figure(figsize=(10, 7))
+    plt.title(title)
+    plt.axhline(0)
+    plt.axvline(0)
+    plt.xlabel(c1)
+    plt.ylabel(c2)
+
+    x = scores_df[c1].values
+    y = scores_df[c2].values
+    plt.scatter(x, y)
+
+    # etichete observații
+    for idx in scores_df.index:
+        plt.text(scores_df.loc[idx, c1], scores_df.loc[idx, c2], str(idx))
+
+    if save_path:
+        plt.savefig(save_path, format='svg', bbox_inches='tight')
+
