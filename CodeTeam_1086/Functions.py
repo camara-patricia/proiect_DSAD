@@ -16,16 +16,6 @@ def standardizare(X):
     return (X - medii) / abateri_std
 
 
-def replace_na(X):
-    """
-    Înlocuiește valorile lipsă (NaN) cu media coloanei.
-    Necesar înainte de ACP deoarece algoritmul nu acceptă NaN.
-    """
-    means = np.nanmean(X, axis=0)
-    k_nan = np.where(np.isnan(X))
-    X[k_nan] = means[k_nan[1]]
-    return X
-
 def center(x):
     """
     Centrează datele (scade media).
