@@ -24,7 +24,9 @@ print(obs, type(obs))
 
 # Extragem variabilele numerice (de la coloana 2 încolo)
 # Primele coloane sunt de identificare(țară și regiune)
-vars = tabel.columns[1:].values
+vars = tabel.select_dtypes(include=[np.number]).columns
+vars = vars.drop(["Year", "Economy_status"])
+vars = np.array(vars)
 m = len(vars)
 print('Numar variabile:', m)
 print(vars, type(vars))
@@ -33,7 +35,7 @@ print(vars, type(vars))
 # Extragem valorile numerice în matricea X
 X = tabel[vars].values
 
-# Construim modelul ACP care va standardiza datele
+# Construim modelul ACP care va standardiza datele[
 modelACP = acp.ACP(X)
 X_std = modelACP.getXstd()
 print(X_std, type(X_std), X_std.shape)
@@ -298,6 +300,101 @@ sil_score = g.silhouette_plot(
     save_path="./dataOUT/silhouette_ward.svg"
 )
 print(f"Silhouette score (WARD): {sil_score:.3f}")
+
+
+g.elbow_dif_from_linkage(
+    h_ward,
+    title="Elbow pe diferențe Δ distanțe de agregare (WARD)",
+    save_path="./dataOUT/elbow_dif_ward.svg"
+)
+print("Elbow pe diferențe (WARD) salvat în ./dataOUT/elbow_dif_ward.svg")
+
+k_fix = 3
+labels_k = hclust.fcluster(h_ward, t=k_fix, criterion='maxclust').astype(int)
+
+pd.DataFrame({"Cluster_k": labels_k}, index=obs).to_csv("./dataOUT/Clusters_k.csv")
+print(f"Clustere partiție-k (k={k_fix}) salvate în ./dataOUT/Clusters_k.csv")
+
+from sklearn.metrics import silhouette_samples, silhouette_score
+
+sil_k_avg = silhouette_score(X_std, labels_k)
+sil_k_vals = silhouette_samples(X_std, labels_k)
+
+pd.DataFrame({"silhouette": sil_k_vals, "cluster": labels_k}, index=obs).to_csv("./dataOUT/Silhouette_k_vals.csv")
+print(f"Silhouette score (k={k_fix}): {sil_k_avg:.3f} | salvat silhouette pe observații în ./dataOUT/Silhouette_k_vals.csv")
+
+g.silhouette_plot(
+    X_std,
+    labels_k,
+    title=f"Silhouette plot (WARD) - partiție-k (k={k_fix})",
+    save_path="./dataOUT/silhouette_k.svg"
+)
+print("Silhouette plot partiție-k salvat în ./dataOUT/silhouette_k.svg")
+
+k_opt = len(np.unique(labels_ward))
+groups_opt, codes_opt = f.cluster_distribution(h_ward, k_opt)
+colors_opt = f.color_clusters(h_ward, k_opt, codes_opt)
+
+g.dendrogram(
+    h=h_ward,
+    labels=obs,
+    title=f"Dendrogramă WARD colorată - partiția optimă (k={k_opt})",
+    threshold=threshold_w,
+    colors=colors_opt
+)
+plt.savefig("./dataOUT/dendrogram_ward_colored_opt.svg", format="svg", bbox_inches="tight")
+print("Dendrogramă WARD colorată (optimală) salvată în ./dataOUT/dendrogram_ward_colored_opt.svg")
+
+
+groups_k, codes_k = f.cluster_distribution(h_ward, k_fix)
+colors_k = f.color_clusters(h_ward, k_fix, codes_k)
+
+g.dendrogram(
+    h=h_ward,
+    labels=obs,
+    title=f"Dendrogramă WARD colorată - partiția-k (k={k_fix})",
+    threshold=None,
+    colors=colors_k
+)
+plt.savefig("./dataOUT/dendrogram_ward_colored_k.svg", format="svg", bbox_inches="tight")
+print("Dendrogramă WARD colorată (partiție-k) salvată în ./dataOUT/dendrogram_ward_colored_k.svg")
+
+g.plot_clusters_in_pca(
+    scoruri_df,
+    labels_ward,
+    c1="C1",
+    c2="C2",
+    title=f"Partiție optimă (WARD) în planul C1-C2 (k={k_opt})",
+    save_path="./dataOUT/partition_opt_C1_C2.svg"
+)
+print("Plot partiție optimă în C1-C2 salvat în ./dataOUT/partition_opt_C1_C2.svg")
+
+g.plot_clusters_in_pca(
+    scoruri_df,
+    labels_k,
+    c1="C1",
+    c2="C2",
+    title=f"Partiție-k (WARD) în planul C1-C2 (k={k_fix})",
+    save_path="./dataOUT/partition_k_C1_C2.svg"
+)
+print("Plot partiție-k în C1-C2 salvat în ./dataOUT/partition_k_C1_C2.svg")
+
+cnt =0
+
+for var in vars:
+    x = tabel[var].values.astype(float)
+
+    g.histograms(x, labels_ward, var)
+    plt.savefig(f"./dataOUT/hist_opt_{var}.svg", format="svg", bbox_inches="tight")
+    cnt += 1
+    g.afiseaza_la_pas(cnt, 10)
+
+    g.histograms(x, labels_k, var)
+    plt.savefig(f"./dataOUT/hist_k_{var}.svg", format="svg", bbox_inches="tight")
+    cnt += 1
+    g.afiseaza_la_pas(cnt, 10)
+
+print("Histograme pe clustere (optimală + k) salvate în ./dataOUT/")
 
 # Afișare toate graficele
 g.afisare()
